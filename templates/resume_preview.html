@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Pratinjau Cetak - {{ data.get('full_name', 'Nama Lengkap') }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS yang sudah diperbarui untuk tampilan lebih profesional */
+        body {
+            background-color: #f4f4f4;
+            font-family: 'Inter', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            font-size: 11pt;
+        }
+        .container {
+            max-width: 850px;
+            margin: 30px auto;
+            background-color: #fff;
+            padding: 40px 50px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: #000;
+            font-weight: 700;
+        }
+        .header .job-title-header {
+            font-size: 1.4em;
+            margin-top: 5px;
+            color: #444;
+            font-weight: 500;
+        }
+        .header .info {
+            font-size: 1em;
+            color: #555;
+            margin-top: 10px;
+        }
+        .section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .section h3 {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        .entry-item {
+            margin-bottom: 20px;
+        }
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        .entry-subheader {
+            font-style: italic;
+            color: #555;
+            margin-top: -2px;
+        }
+        .entry-item p {
+            margin-top: 5px;
+            color: #444;
+        }
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .skills span {
+            background-color: #eef2ff;
+            color: #4338ca;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        /* Sembunyikan tombol saat mencetak */
+        @media print {
+            body {
+                background-color: #fff;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                border: none;
+                margin: 0;
+                padding: 0;
+                max-width: 100%;
+                box-shadow: none;
+                border-radius: 0;
+            }
+            #print-button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ data.get('full_name', 'Nama Lengkap') }}</h1>
+            <div class="job-title-header">{{ data.get('job_title', 'Jabatan') }}</div>
+            <div class="info">{{ data.get('email', 'email@example.com') }} | {{ data.get('phone', '(123) 456-7890') }}</div>
+            <p class="info"><strong>Predicted Job Field:</strong> {{ predicted_category }}</p>
+        </div>
+
+        <div class="section">
+            <h3>Ringkasan Profesional</h3>
+            <p>{{ data.get('summary', 'Tulis ringkasan profesional Anda di sini.') }}</p>
+        </div>
+
+        <div class="section">
+            <h3>Pengalaman Kerja</h3>
+            {% if data['work_title[]'] %}
+                {% for title, company, start, end, desc in zip(data['work_title[]'], data['company[]'], data['work_start[]'], data['work_end[]'], data['work_desc[]']) %}
+                  <div class="entry-item">
+                    <div class="entry-header">
+                        <span>{{ title or 'Jabatan' }}</span>
+                        <span class="date-range">{{ start or 'Mulai' }} - {{ end or 'Selesai' }}</span>
+                    </div>
+                    <div class="entry-subheader">{{ company or 'Perusahaan' }}</div>
+                    <p>{{ desc or 'Deskripsi pekerjaan.' }}</p>
+                  </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h3>Pendidikan</h3>
+            {% if data['edu_school[]'] %}
+                {% for school, degree, start, end, desc in zip(data['edu_school[]'], data['edu_degree[]'], data['edu_start[]'], data['edu_end[]'], data['edu_desc[]']) %}
+                  <div class="entry-item">
+                    <div class="entry-header">
+                        <span>{{ degree or 'Gelar' }}</span>
+                        <span class="date-range">{{ start or 'Mulai' }} - {{ end or 'Selesai' }}</span>
+                    </div>
+                    <div class="entry-subheader">{{ school or 'Sekolah/Universitas' }}</div>
+                    <p>{{ desc or 'Deskripsi pendidikan.' }}</p>
+                  </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h3>Keterampilan</h3>
+            <div class="skills">
+              {% for skill in data.get('skills', []) %}
+                {% if skill.strip() %}
+                    <span>{{ skill | trim }}</span>
+                {% endif %}
+              {% endfor %}
+            </div>
+        </div>
+        
+        <div class="action-buttons" style="text-align: center; margin-top: 40px;">
+            <button id="print-button" class="btn btn-download" onclick="window.print()" style="padding: 12px 25px; font-size: 1.1em;">Cetak / Simpan ke PDF</button>
+        </div>
+    </div>
+
+    <script>
+        // Secara otomatis memicu dialog cetak saat halaman dimuat
+        window.onload = function() {
+            window.print();
+        };
+    </script>
+</body>
+</html>

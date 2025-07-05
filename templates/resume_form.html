@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C6 - Job Title Predictor & Resume Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  
+  <style>
+    /*
+      Kode ini bertujuan untuk memastikan hanya ada satu scrollbar utama di browser.
+      Aturan ini akan menimpa style dari file 'style.css' jika ada yang konflik.
+    */
+    html, body {
+      /* Memastikan elemen root dapat tumbuh sesuai tinggi konten. */
+      height: auto;
+    }
+
+    .panel, .editor-panel, .preview-panel {
+      /* Mencegah panel memiliki tinggi tetap dan scrollbar internal.
+        'height: auto' membuat panel tumbuh sesuai konten di dalamnya.
+        'overflow-y: visible' memastikan konten yang meluap tidak terpotong atau memicu scrollbar panel.
+      */
+      height: auto;
+      overflow-y: visible; 
+    }
+  </style>
+
+</head>
+<body>
+  <div class="panel editor-panel">
+    <h2>Editor Resume</h2>
+    <div class="form-content">
+      <h3>Informasi Personal</h3>
+      <div class="form-group">
+        <label for="full_name">Nama Lengkap</label>
+        <input type="text" id="full_name" name="full_name" value="{{ data['full_name'][0] if data and 'full_name' in data else '' }}">
+      </div>
+      <div class="form-group">
+        <label for="job_title_editor">Jabatan</label>
+        <input type="text" id="job_title_editor" name="job_title" value="{{ data['job_title'][0] if data and 'job_title' in data else '' }}">
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ data['email'][0] if data and 'email' in data else '' }}">
+      </div>
+      <div class="form-group">
+        <label for="phone">Telepon</label>
+        <input type="tel" id="phone" name="phone" value="{{ data['phone'][0] if data and 'phone' in data else '' }}">
+      </div>
+
+      <label>Ringkasan Profesional</label>
+      <div class="form-group">
+        <textarea id="summary" name="summary" rows="8">{{ data['summary'][0] if data and 'summary' in data else '' }}</textarea>
+      </div>
+
+      <h3>Pendidikan</h3>
+      <div id="education-container">
+        {% if data and 'edu_school[]' in data %}
+          {% for i in range(data['edu_school[]']|length) %}
+            <div class="entry-block">
+              <button type="button" class="remove-btn" onclick="this.parentElement.remove(); updateResumePreview();">x</button>
+              <div class="form-group"><label>Gelar / Program</label><input type="text" name="edu_degree[]" value="{{ data['edu_degree[]'][i] }}"></div>
+              <div class="form-group"><label>Sekolah / Institusi</label><input type="text" name="edu_school[]" value="{{ data['edu_school[]'][i] }}"></div>
+              <div class="form-group"><label>Tanggal Mulai</label><input type="text" name="edu_start[]" value="{{ data['edu_start[]'][i] }}"></div>
+              <div class="form-group"><label>Tanggal Selesai</label><input type="text" name="edu_end[]" value="{{ data['edu_end[]'][i] }}"></div>
+              <div class="form-group"><label>Deskripsi</label><textarea name="edu_desc[]" rows="4">{{ data['edu_desc[]'][i] }}</textarea></div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+      <button type="button" class="add-button" onclick="addEducation()">+ Tambah Pendidikan</button>
+
+      <h3>Pengalaman Kerja</h3>
+      <div id="work-container">
+        {% if data and 'work_title[]' in data %}
+          {% for i in range(data['work_title[]']|length) %}
+            <div class="entry-block">
+              <button type="button" class="remove-btn" onclick="this.parentElement.remove(); updateResumePreview();">x</button>
+              <div class="form-group"><label>Jabatan</label><input type="text" name="work_title[]" value="{{ data['work_title[]'][i] }}"></div>
+              <div class="form-group"><label>Perusahaan</label><input type="text" name="company[]" value="{{ data['company[]'][i] }}"></div>
+              <div class="form-group"><label>Tanggal Mulai</label><input type="text" name="work_start[]" value="{{ data['work_start[]'][i] }}"></div>
+              <div class="form-group"><label>Tanggal Selesai</label><input type="text" name="work_end[]" value="{{ data['work_end[]'][i] }}"></div>
+              <div class="form-group"><label>Deskripsi</label><textarea name="work_desc[]" rows="4">{{ data['work_desc[]'][i] }}</textarea></div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+      <button type="button" class="add-button" onclick="addWork()">+ Tambah Pengalaman</button>
+
+      <h3>Keterampilan Teknis</h3>
+      <div class="skills-input" id="skills-box">
+        <input type="text" id="skillInput" placeholder="Ketik dan tekan Enter">
+      </div>
+      <input type="hidden" name="skills" id="skillsHidden" value="{{ data['skills'][0] if data and 'skills' in data else '' }}">
+
+      <div class="action-buttons">
+        <form method="POST" action="{{ url_for('edit_resume') }}" id="saveDraftForm">
+          <button class="btn btn-download" type="submit">Simpan Draf</button>
+        </form>
+        <button type="button" class="btn btn-clear" onclick="window.location.href='/clear_session_data'">Bersihkan Formulir</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel preview-panel">
+    <div class="sub-panel resume-preview-sub-panel">
+      <div class="container" id="resume-preview-container">
+        <div class="header">
+          <h1>Nama Lengkap</h1>
+          <div class="job-title-header">Jabatan</div>
+          <div class="info">email@example.com | (123) 456-7890</div>
+          <p class="info" id="predicted-category-preview"><strong>Bidang Pekerjaan yang Diprediksi:</strong> Belum Diprediksi</p>
+        </div>
+
+      <div class="section">
+        <h3>Ringkasan Profesional</h3>
+        <p id="preview-summary">Tulis ringkasan profesional Anda di sini.</p>
+      </div>
+
+      <div class="section">
+        <h3>Pengalaman Kerja</h3>
+        <div id="preview-work-experience"><p>Belum ada pengalaman kerja.</p></div>
+      </div>
+
+      <div class="section">
+        <h3>Pendidikan</h3>
+        <div id="preview-education"><p>Belum ada riwayat pendidikan.</p></div>
+      </div>
+
+      <div class="section">
+        <h3>Keterampilan</h3>
+        <div class="skills" id="preview-skills"><span>Belum ada keterampilan.</span></div>
+      </div>
+
+    <div class="action-buttons">
+      <form method="POST" action="{{ url_for('preview') }}" id="downloadPdfFormPreview" target="_blank">
+        <input type="hidden" name="predicted_category" value="{{ predicted_category }}">
+        <button class="btn btn-download" type="submit">Cetak / Simpan ke PDF</button>
+      </form>
+    </div>
+
+    </div>
+   </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

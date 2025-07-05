@@ -1,0 +1,599 @@
+:root {
+  --primary-color: #4f46e5; /* Biru Indigo */
+  --secondary-color: #6b7280; /* Abu-abu Sedang */
+  --accent-color: #10b981; /* Hijau Teal */
+  --text-color: #111827; /* Dark Gray - Lebih gelap untuk teks utama */
+  --light-gray: #f9fafb; /* Sangat terang, untuk background body */
+  --medium-gray: #d1d5db; /* Abu-abu Border Input */
+  --dark-gray: #e5e7eb; /* Abu-abu Border Entry Block */
+  --skill-badge-bg: #6366f1; /* Biru untuk skill badge (Inter Poppins sesuai) */
+  --skill-badge-text: white;
+  --nlp-bg: #f8faff; /* Latar belakang untuk setiap stage NLP */
+  --nlp-pre-bg: #eef2ff; /* Latar belakang untuk kode/output di NLP */
+  --nlp-error-bg: #ffebeb;
+  --nlp-error-text: #d8000c;
+
+  --border-radius-base: 8px; /* Radius sudut standar */
+  --shadow-sm: 0 4px 10px rgba(0,0,0,0.1);
+  --shadow-md: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+/* Base styles - Poppins font */
+body {
+  font-family: 'Poppins', sans-serif; /* Menggunakan Poppins */
+  background: var(--light-gray);
+  margin: 0;
+  padding: 20px;
+  line-height: 1.6;
+  color: var(--text-color);
+  display: flex; /* Flexbox untuk layout 2 kolom */
+  justify-content: center;
+  gap: 20px; /* Jarak antara kolom */
+  min-height: 100vh;
+  align-items: flex-start; /* Konten dimulai dari atas */
+  max-width: 1500px; /* Batasan lebar maksimum untuk seluruh layout */
+  margin: 0 auto; /* Pusatkan layout */
+}
+
+.panel {
+  background: white;
+  padding: 25px;
+  border-radius: var(--border-radius-base);
+  box-shadow: var(--shadow-sm);
+  box-sizing: border-box;
+  min-width: 300px;
+}
+
+/* Layout perbandingan 3:4 */
+.editor-panel {
+  flex-grow: 3;
+  flex-basis: 0; /* Penting saat menggunakan flex-grow/shrink */
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-panel {
+  flex-grow: 4;
+  flex-basis: 0; /* Penting saat menggunakan flex-grow/shrink */
+  padding: 0; /* Padding ditangani oleh elemen di dalamnya */
+  max-height: calc(100vh - 40px); /* Sesuaikan tinggi agar sesuai viewport */
+  display: flex;
+  flex-direction: column;
+  /* Tambahkan overflow-y: auto untuk panel kanan keseluruhan jika diperlukan,
+     tapi kita akan membuatnya scrollable di sub-panel NLP */
+  overflow-y: auto; /* Make the whole preview panel scrollable if content exceeds height */
+}
+
+/* Sub-panels inside preview-panel */
+.preview-panel .sub-panel {
+  background: white;
+  padding: 25px;
+  border-radius: var(--border-radius-base);
+  box-shadow: var(--shadow-sm); /* Keep shadow for sub-panels */
+  box-sizing: border-box;
+  margin-bottom: 20px; /* Space between sub-panels */
+}
+
+.preview-panel .sub-panel:last-child {
+  margin-bottom: 0; /* No margin after the last sub-panel */
+}
+
+
+/* Editor specific styles */
+.editor-panel h2 {
+  margin-top: 0;
+  color: var(--primary-color);
+  font-size: 24px;
+  border-bottom: 2px solid var(--medium-gray);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.editor-panel h3 {
+  font-size: 18px;
+  color: var(--primary-color);
+  margin-top: 25px;
+  margin-bottom: 15px;
+  border-bottom: 1px dashed var(--medium-gray);
+  padding-bottom: 5px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #555;
+  font-size: 14px;
+}
+
+.editor-panel input[type="text"],
+.editor-panel input[type="email"],
+.editor-panel input[type="tel"],
+.editor-panel textarea {
+  width: calc(100% - 20px); /* Menyesuaikan untuk padding/border */
+  padding: 10px;
+  border: 1px solid var(--medium-gray);
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif; /* Poppins untuk input */
+  font-size: 15px;
+  color: var(--text-color);
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  box-sizing: border-box; /* Pastikan padding tidak menambah lebar */
+}
+
+.editor-panel input:focus,
+.editor-panel textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  outline: none;
+}
+
+.editor-panel textarea {
+  resize: vertical;
+}
+
+/* Entry blocks for dynamic fields (Education, Work) */
+.entry-block {
+  border: 1px solid var(--dark-gray); /* Border untuk blok entri */
+  padding: 15px;
+  border-radius: var(--border-radius-base);
+  margin-bottom: 20px;
+  position: relative;
+  background-color: #fcfcfc;
+}
+
+.entry-block .remove-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ef4444; /* Merah untuk tombol hapus */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  transition: background-color 0.2s ease;
+}
+.entry-block .remove-btn:hover {
+  background: #dc2626;
+}
+
+.add-button {
+    background-color: #3b82f6; /* Biru untuk tombol tambah */
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    margin-top: 10px;
+    transition: background-color 0.2s ease;
+    display: inline-block; /* Agar bisa diatur margin-top */
+}
+.add-button:hover {
+    background-color: #2563eb;
+}
+
+/* Skills input tags */
+.skills-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--medium-gray);
+  border-radius: 6px;
+  min-height: 46px; /* Tinggi minimum agar terlihat seperti input */
+  cursor: text;
+  background-color: white; /* Pastikan background putih */
+}
+
+.skills-input input { /* Input di dalam skills-input */
+  border: none;
+  outline: none;
+  font-size: 14px;
+  flex: 1; /* Agar input bisa tumbuh */
+  min-width: 120px;
+  padding: 0; /* Hapus padding default input */
+  margin: 0; /* Hapus margin default input */
+  height: auto; /* Biarkan tinggi diatur secara otomatis */
+}
+
+.skill-badge {
+  background-color: var(--skill-badge-bg);
+  color: var(--skill-badge-text);
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap; /* Jangan putus baris */
+}
+
+.skill-badge span { /* Tombol hapus di badge */
+  margin-left: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 1;
+  color: rgba(255,255,255,0.7); /* Lebih transparan */
+}
+.skill-badge span:hover {
+    color: white;
+}
+
+
+/* Tab buttons */
+.content-tabs {
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--medium-gray);
+  display: flex;
+}
+
+.tab-button {
+  background-color: transparent;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #777;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tab-button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  font-weight: 600;
+}
+
+.tab-button:hover:not(.active) {
+  color: #555;
+  border-bottom-color: #bbb;
+}
+
+/* --- Resume Preview & NLP Process View (Right Panel) --- */
+/* Resume Preview specific styles */
+.resume-preview-sub-panel .container { /* Ini adalah container untuk tampilan resume di panel kanan */
+  padding: 0; /* Remove padding here as sub-panel already has it */
+  border-radius: var(--border-radius-base);
+  background: white;
+  box-shadow: none; /* Bayangan ada di parent .panel atau .sub-panel */
+}
+
+.header {
+  background: var(--primary-color);
+  color: white;
+  padding: 30px 40px;
+  border-radius: var(--border-radius-base) var(--border-radius-base) 0 0;
+  margin: -25px -25px 30px -25px; /* Adjust margin to fit within sub-panel's padding */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.header .job-title-header {
+  font-size: 20px;
+  font-weight: 500;
+  margin-top: 5px;
+  opacity: 0.9;
+}
+
+.info {
+  margin-top: 15px;
+  font-size: 15px;
+  opacity: 0.9;
+}
+
+.info strong {
+  font-weight: 500;
+}
+
+.section {
+  margin-top: 35px;
+  padding-top: 15px;
+  border-top: 1px solid var(--medium-gray);
+}
+
+.section:first-of-type {
+  margin-top: 0;
+  border-top: none;
+  padding-top: 0;
+}
+
+.section h3 {
+  font-size: 22px;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.section h3::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 50px;
+  height: 3px;
+  background-color: var(--primary-color);
+  border-radius: 2px;
+}
+
+.section p {
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.work-experience-item, .education-item {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px dashed var(--medium-gray);
+}
+
+.work-experience-item:last-child, .education-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.work-experience-item strong, .education-item strong {
+  display: block;
+  font-size: 17px;
+  margin-bottom: 3px;
+  color: var(--primary-color);
+}
+
+.work-experience-item em, .education-item em {
+  display: block;
+  font-style: normal;
+  color: #555;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.work-experience-item .date-range, .education-item .date-range {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.skills span {
+  background: var(--dark-gray);
+  color: var(--text-color); /* Adjusted to text-color for better contrast */
+  padding: 8px 15px;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.skills span:hover {
+  background-color: #c7d2fe;
+}
+
+.action-buttons { /* Container untuk tombol Unduh, Kembali, Hapus Form */
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--medium-gray);
+    display: flex;
+    flex-wrap: wrap; /* Izinkan tombol wrap */
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: var(--border-radius-base);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-download { /* Now "Simpan & Pratinjau" in editor, "Unduh PDF" in preview */
+  background-color: var(--accent-color);
+  color: white;
+}
+.btn-download:hover {
+  background-color: #0e9f6e;
+  transform: translateY(-2px);
+}
+
+.btn-back { /* Tombol kembali ke edit */
+  background-color: var(--secondary-color);
+  color: white;
+}
+.btn-back:hover {
+  background-color: #5a616d;
+  transform: translateY(-2px);
+}
+
+.btn-clear { /* Tombol hapus form */
+    background-color: #f43f5e;
+    color: white;
+}
+.btn-clear:hover {
+    background-color: #e11d48;
+    transform: translateY(-2px);
+}
+
+
+/* --- NLP Process View specific styles --- */
+.nlp-process-sub-panel {
+    /* Make the NLP sub-panel scrollable vertically */
+    flex-shrink: 0; /* Prevent it from shrinking */
+    max-height: 400px; /* Adjust as needed */
+    overflow-y: auto;
+    background: #fdfdfd; /* Background for the scrollable area */
+    border-radius: var(--border-radius-base);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08); /* Keep shadow */
+}
+
+.nlp-process-view {
+  padding: 0; /* Padding is handled by .sub-panel, so remove here */
+}
+
+.nlp-process-view h3 {
+  font-size: 18px;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  border-bottom: 1px dashed var(--medium-gray);
+  padding-bottom: 8px;
+  margin-top: 0; /* Reset margin top */
+}
+
+.nlp-output-stage {
+  margin-bottom: 15px;
+  border-left: 3px solid var(--primary-color);
+  padding-left: 10px;
+  background-color: var(--nlp-bg);
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-radius: 4px;
+}
+
+.nlp-output-stage strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+  font-size: 16px;
+}
+
+.nlp-output-stage pre {
+  background-color: var(--nlp-pre-bg);
+  padding: 10px;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #333;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.nlp-output-stage pre.error {
+  background-color: var(--nlp-error-bg);
+  color: var(--nlp-error-text);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  body {
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    gap: 15px;
+    max-width: none;
+  }
+  .panel {
+    max-width: 700px;
+    width: 100%;
+    margin-bottom: 10px;
+    flex-grow: 1;
+    flex-basis: auto;
+  }
+  .preview-panel {
+    max-height: none; /* Allow full height in column layout */
+    overflow-y: visible; /* Prevent scroll on the main panel */
+  }
+  .nlp-process-sub-panel {
+    max-height: 400px; /* Keep scrollable max-height for NLP section */
+  }
+}
+
+@media (max-width: 768px) {
+  .panel {
+    padding: 20px;
+  }
+  .header {
+    padding: 20px 25px;
+    margin: -20px -20px 20px -20px;
+  }
+  .header h1 {
+    font-size: 28px;
+  }
+  .header .job-title-header {
+    font-size: 18px;
+  }
+  .section h3 {
+    font-size: 20px;
+  }
+  .action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+  .panel {
+    padding: 15px;
+    border-radius: 8px;
+  }
+  .header {
+    padding: 15px 20px;
+    margin: -15px -15px 15px -15px;
+    border-radius: 6px 6px 0 0;
+  }
+  .header h1 {
+    font-size: 24px;
+  }
+  .header .job-title-header {
+    font-size: 16px;
+  }
+  .info {
+    font-size: 13px;
+  }
+  .section {
+    margin-top: 25px;
+  }
+  .section h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .section h3::after {
+    width: 40px;
+    height: 2px;
+  }
+  .skills span {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  .nlp-output-stage pre {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
