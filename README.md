@@ -11,7 +11,7 @@ This project is a Python-based **Resume Builder** that also functions as a **Job
   * **Machine Learning Integration:** Employs **Joblib** for efficient loading and prediction with a pre-trained **Naive Bayes** machine learning model.
 
 ### Demo / Screenshots
-![PDF Export View 1](images/pdf_view_1.png)
+![Full Demo Image](git.png)
 1.  Resume Input Form
 2.  Generated Resume Preview and Job Title Prediction
 3 & 4. Resume View for PDF Export
