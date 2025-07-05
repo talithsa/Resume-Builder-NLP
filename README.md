@@ -12,9 +12,7 @@ This project is a Python-based **Resume Builder** that also functions as a **Job
 
 ### Demo / Screenshots
 ![Full Demo Image](git.png)
-1.  Resume Input Form
-2.  Generated Resume Preview and Job Title Prediction
-3 & 4. Resume View for PDF Export
+*(1) Resume Input Form, (2) Generated Resume Preview and Job Title Prediction, (3&4) Resume View for PDF Export.*
 
 ## How Job Title Prediction Works
 The core of the job title prediction functionality relies on a **pre-trained Naive Bayes Classifier**. This model, along with its associated TF-IDF vectorizer (used to convert text into numerical features), is stored as **`.pkl` files**. When a user enters their professional summary into the application, the following steps occur:
